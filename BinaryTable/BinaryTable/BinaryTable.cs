@@ -78,25 +78,20 @@ namespace MostafaTech
 					}
 				}
 
-				// compression
+				mem.Position = 0;
+				stream.Position = 0;
+
 				if (compress)
 				{
-					using (var mem2 = new MemoryStream())
+					using (var gzip = new GZipStream(stream, CompressionMode.Compress))
 					{
-						using (var zip = new GZipStream(mem2, CompressionMode.Compress))
-						{
-							mem.Position = 0;
-							mem.CopyTo(zip);
-							mem.Dispose();
-							mem = new MemoryStream();
-							mem2.Position = 0;
-							mem2.CopyTo(mem);
-						}
+						mem.CopyTo(gzip);
 					}
 				}
-
-				mem.Position = 0;
-				mem.CopyTo(stream);
+				else
+				{
+					mem.CopyTo(stream);
+				}
 
 			}
 			catch (Exception ex)
@@ -105,8 +100,8 @@ namespace MostafaTech
 			}
 			finally
 			{
-				bw.Dispose();
-				mem.Dispose();
+				bw.Close();
+				mem.Close();
 				stream.Close();
 			}
 		}
@@ -181,7 +176,7 @@ namespace MostafaTech
 			}
 			finally
 			{
-				inStream.Dispose();
+				inStream.Close();
 				stream.Close();
 			}
 
